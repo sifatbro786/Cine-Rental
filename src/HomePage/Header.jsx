@@ -1,16 +1,21 @@
 import logo from "../assets/logo.svg";
 import ring from "../assets/ring.svg";
 import moon from "../assets/icons/moon.svg";
+import sun from "../assets/icons/sun.svg";
 import cart from "../assets/shopping-cart.svg";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import CartDetails from "./Cine/CartDetails";
+import { MovieContext, ThemeContext } from "../context";
 
 export default function Header() {
   const [showCart, setShowCart] = useState(false);
 
+  const { cartData } = useContext(MovieContext);
+  const { darkMode, setDarkMode } = useContext(ThemeContext);
+
   const handleCartShow = () => {
     setShowCart(true);
-  }
+  };
 
   return (
     <header>
@@ -33,17 +38,28 @@ export default function Header() {
             <a
               className="bg-primary/20 dark:bg-primary/[7%] rounded-lg backdrop-blur-[2px] p-1 inline-block"
               href="#"
+              onClick={() => setDarkMode((darkMode) => !darkMode)}
             >
-              <img src={moon} width="24" height="24" alt="sun-icon" />
+              <img
+                src={darkMode ? sun : moon}
+                width="24"
+                height="24"
+                alt="sun-icon"
+              />
             </a>
           </li>
           <li>
             <a
-              className="bg-primary/20 dark:bg-primary/[7%] rounded-lg backdrop-blur-[2px] p-1 inline-block"
+              className="relative bg-primary/20 dark:bg-primary/[7%] rounded-lg backdrop-blur-[2px] p-1 inline-block"
               href="#"
               onClick={handleCartShow}
             >
               <img src={cart} width="24" height="24" alt="cart-icon" />
+              {cartData.length > 0 && (
+                <span className="rounded-full absolute top-[-15px] left-[26px] bg-[#12CF6F] text-white text-center p-[2px] w-[30px] h-[30px]">
+                  {cartData.length}
+                </span>
+              )}
             </a>
           </li>
         </ul>
