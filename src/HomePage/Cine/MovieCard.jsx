@@ -4,23 +4,37 @@ import Rating from "./Rating";
 import MovieDetailsModal from "./MovieDetailsModal";
 import tag from "../../assets/tag.svg";
 import { MovieContext } from "../../context";
+import { toast } from "react-toastify";
 
 export default function MovieCard({ movie }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  const { cartData, setCartData } = useContext(MovieContext);
+  const { state, dispatch } = useContext(MovieContext);
 
   const handleAddToCart = (e, movie) => {
     e.stopPropagation();
 
-    const found = cartData.find((item) => item.id === movie.id);
+    const found = state.cartData.find((item) => item.id === movie.id);
     if (!found) {
-      setCartData([...cartData, movie]);
+      dispatch({
+        type: "ADD_TO_CART",
+        payload: {
+          ...movie,
+        },
+      });
+
+      toast.success(`Movie ${movie.title} added successfully`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        theme: "light",
+      });
     } else {
-      console.error(
-        `The movie ${movie.title} has been added to the cart already!`
-      );
+      toast.error(`Movie ${movie.title} has been added already`, {
+        position: "bottom-right",
+        autoClose: 3000,
+        theme: "light",
+      });
     }
   };
 
@@ -37,10 +51,14 @@ export default function MovieCard({ movie }) {
   return (
     <>
       {showModal && (
-        <MovieDetailsModal movie={selectedMovie} onClose={handleModalClose} onCartAdd={handleAddToCart} />
+        <MovieDetailsModal
+          movie={selectedMovie}
+          onClose={handleModalClose}
+          onCartAdd={handleAddToCart}
+        />
       )}
       <figure className="p-4 border border-black/10 shadow-sm dark:border-white/10 rounded-xl">
-        <button onClick={() => handleMovieSelection(movie)}>
+        <a onClick={() => handleMovieSelection(movie)}>
           <img
             className="w-full object-cover"
             src={getImgUrl(movie.cover)}
@@ -52,16 +70,16 @@ export default function MovieCard({ movie }) {
             <div className="flex items-center space-x-1 mb-5">
               <Rating value={movie.rating} />
             </div>
-            <a
+            <button
               className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
               href="#"
               onClick={(e) => handleAddToCart(e, movie)}
             >
               <img src={tag} alt="tag-icon" />
               <span>${movie.price} | Add to Cart</span>
-            </a>
+            </button>
           </figcaption>
-        </button>
+        </a>
       </figure>
     </>
   );
